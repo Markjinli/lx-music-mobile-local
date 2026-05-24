@@ -17,17 +17,19 @@ jobs:
       - name: Setup Env
         uses: ./.github/actions/setup
 
+      - name: Patch signing config to use debug keystore
+        shell: bash
+        run: |
+          # 注释掉 build.gradle 中覆盖 debug 签名的行，让 release 使用 debug 签名
+          sed -i 's/signingConfig signingConfigs.release/\/\/ signingConfig signingConfigs.release/' android/app/build.gradle
+
       - name: Build Release APK with Debug Keystore
         env:
           DISABLE_SVG: 1
         shell: bash
         run: |
           cd android
-          ./gradlew assembleRelease \
-            -PMYAPP_UPLOAD_STORE_FILE="$HOME/.android/debug.keystore" \
-            -PMYAPP_UPLOAD_KEY_ALIAS="androiddebugkey" \
-            -PMYAPP_UPLOAD_STORE_PASSWORD="android" \
-            -PMYAPP_UPLOAD_KEY_PASSWORD="android"
+          ./gradlew assembleRelease
 
       - name: Get package version
         run: |
