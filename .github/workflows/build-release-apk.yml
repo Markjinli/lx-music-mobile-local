@@ -17,13 +17,33 @@ jobs:
       - name: Setup Env
         uses: ./.github/actions/setup
 
+      - name: Create debug keystore for Gradle config phase
+        shell: bash
+        run: |
+          # signingConfigs.release 块在配置阶段就需要 keystore 或 -P 参数
+          # 生成一个 dummy keystore 以满足配置阶段校验（实际构建用 debug 签名）
+          keytool -genkey -v \
+            -keystore "$HOME/.android/debug.keystore" \
+            -alias androiddebugkey \
+            -storepass android \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -noprompt 2>/dev/null || true
+
       - name: Build Debug APK
         env:
           DISABLE_SVG: 1
         shell: bash
         run: |
           cd android
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug \
+            -PMYAPP_UPLOAD_STORE_FILE="$HOME/.android/debug.keystore" \
+            -PMYAPP_UPLOAD_KEY_ALIAS="androiddebugkey" \
+            -PMYAPP_UPLOAD_STORE_PASSWORD="android" \
+            -PMYAPP_UPLOAD_KEY_PASSWORD="android"
 
       - name: Get package version
         run: |
