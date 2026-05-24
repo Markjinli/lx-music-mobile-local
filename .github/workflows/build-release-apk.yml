@@ -21,7 +21,7 @@ jobs:
         shell: bash
         run: |
           # signingConfigs.release 块在配置阶段就需要 keystore 或 -P 参数
-          # 生成一个 dummy keystore 以满足配置阶段校验（实际构建用 debug 签名）
+          # 生成一个 dummy keystore 以满足配置阶段校验
           mkdir -p "$HOME/.android"
           keytool -genkey -v \
             -keystore "$HOME/.android/debug.keystore" \
@@ -34,13 +34,20 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US" \
             -noprompt 2>/dev/null || true
 
-      - name: Build Debug APK
+      - name: Patch build.gradle to use debug signing for release
+        shell: bash
+        run: |
+          # build.gradle 第 164 行 signingConfig signingConfigs.release 会覆盖第 160 行的 debug 签名
+          # 删除该行，让 release 构建使用 debug.keystore 签名（JS 正常打包进 APK）
+          sed -i '/^[[:space:]]*signingConfig signingConfigs\.release$/d' android/app/build.gradle
+
+      - name: Build Release APK
         env:
           DISABLE_SVG: 1
         shell: bash
         run: |
           cd android
-          ./gradlew assembleDebug \
+          ./gradlew assembleRelease \
             -PMYAPP_UPLOAD_STORE_FILE="$HOME/.android/debug.keystore" \
             -PMYAPP_UPLOAD_KEY_ALIAS="androiddebugkey" \
             -PMYAPP_UPLOAD_STORE_PASSWORD="android" \
@@ -53,7 +60,7 @@ jobs:
 
       - name: Generate file MD5
         run: |
-          cd android/app/build/outputs/apk/debug
+          cd android/app/build/outputs/apk/release
           md5sum *.apk
 
       - name: Create Release and Upload APKs
@@ -70,10 +77,10 @@ jobs:
             - 新增「本地音乐」扫描导入功能
             - 详细改动见 [README](https://github.com/Markjinli/lx-music-mobile-local#fork-说明)
 
-            > Debug 构建，安装前需卸载原版。
+            > 使用 debug 签名构建，安装前需卸载原版。
           draft: false
           prerelease: false
           files: |
-            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
