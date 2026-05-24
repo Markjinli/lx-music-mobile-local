@@ -14,6 +14,35 @@
 
 <p align="center">一个基于 React Native 开发的音乐软件</p>
 
+---
+
+## Fork 说明
+
+本仓库是 [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 的 Fork 版本。
+
+**与原版的差异：**
+
+- **新增「本地音乐」功能**：在设置中可选择本地文件夹并扫描音频文件，自动创建"本地音乐"列表，支持完整标签信息读取，缺失信息自动用占位数据填充。
+- 功能实现尽量保持低侵入性，大部分为新增代码，便于后续跟随上游更新。
+
+**改动文件清单：**
+
+| 类型 | 文件 | 说明 |
+|---|---|---|
+| ➕ 新增 | `src/core/localMusic.ts` | 扫描核心逻辑：文件夹扫描、元数据读取、调用现有 API 创建列表 |
+| ➕ 新增 | `src/screens/Home/Views/Setting/settings/LocalMusic/index.tsx` | 设置页 UI：文件夹选择器、扫描按钮、进度条 |
+| ✏️ 修改 | `src/config/defaultSetting.ts` | +2 行：添加 `localMusic.folderPath`、`localMusic.listId` 默认值 |
+| ✏️ 修改 | `src/types/app_setting.d.ts` | +8 行：添加两个字段的类型定义 |
+| ✏️ 修改 | `src/screens/Home/Views/Setting/Main.tsx` | +3 行：注册 LocalMusic 设置项 |
+| ✏️ 修改 | `src/screens/Home/Views/Setting/Vertical/Main.tsx` | +3 行：注册 LocalMusic 渲染 |
+| ✏️ 修改 | `src/lang/zh-cn.json` | +14 行：中文文本 |
+| ✏️ 修改 | `src/lang/en-us.json` | +14 行：英文文本 |
+| ✏️ 修改 | `src/lang/zh-tw.json` | +14 行：繁体中文文本 |
+
+**Fork 地址：** https://github.com/Markjinli/lx-music-mobile-fork
+
+---
+
 ## 说明
 
 所用技术栈：
