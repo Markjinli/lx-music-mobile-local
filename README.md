@@ -39,7 +39,18 @@
 | ✏️ 修改 | `src/lang/en-us.json` | +14 行：英文文本 |
 | ✏️ 修改 | `src/lang/zh-tw.json` | +14 行：繁体中文文本 |
 
-**Fork 地址：** https://github.com/Markjinli/lx-music-mobile-fork
+**Fork 地址：** https://github.com/Markjinli/lx-music-mobile-local
+
+---
+
+## 下载
+
+> APK 由 GitHub Actions 自动构建，使用 debug 签名。安装前需先卸载原版 LX Music。
+
+| 版本 | 下载 |
+|---|---|
+| 最新版（支持本地音乐） | [Releases 页面](https://github.com/Markjinli/lx-music-mobile-local/releases) |
+| 原版（无本地音乐功能） | [原版 Releases](https://github.com/lyswhut/lx-music-mobile/releases) |
 
 ---
 
