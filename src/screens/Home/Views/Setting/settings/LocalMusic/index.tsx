@@ -20,9 +20,9 @@ export default memo(() => {
 
   const handleSelectFolder = useCallback(async() => {
     try {
-      const path = await selectManagedFolder(true)
-      if (path) {
-        setFolderPath(path)
+      const result = await selectManagedFolder(true)
+      if (result?.path) {
+        setFolderPath(result.path)
       }
     } catch {
       // 用户取消选择
