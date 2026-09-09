@@ -19,9 +19,9 @@ export const hideModal = (componentId: string) => {
   void Navigation.dismissOverlay(componentId)
 }
 
-export const checkUpdate = async() => {
+export const checkUpdate = async(options?: { autoDownload?: boolean }) => {
   versionActions.setVersionInfo({ status: 'checking' })
-  let versionInfo: InitState['versionInfo'] = { ...versionState.versionInfo }
+  let versionInfo: InitState['versionInfo'] = { ...versionState.versionInfo, isLatest: false }
   try {
     const { version, desc, history } = await getVersionInfo()
     versionInfo.newVersion = {
@@ -36,11 +36,6 @@ export const checkUpdate = async() => {
       history: [],
     }
   }
-  // const versionInfo = {
-  //   version: '1.9.0',
-  //   desc: '- 更新xxx\n- 修复xxx123的萨达修复xxx123的萨达修复xxx123的萨达修复xxx123的萨达修复xxx123的萨达',
-  //   history: [{ version: '1.8.0', desc: '- 更新xxx22\n- 修复xxx22' }, { version: '1.7.0', desc: '- 更新xxx22\n- 修复xxx22' }],
-  // }
   if (versionInfo.newVersion.version == '0.0.0') {
     versionInfo.isUnknown = true
     versionInfo.status = 'error'
@@ -62,10 +57,9 @@ export const checkUpdate = async() => {
       toast(global.i18n.t('version_tip_unknown'))
     } else if (versionInfo.newVersion.version != await getIgnoreVersion()) {
       showModal()
+      if (options?.autoDownload) downloadUpdate()
     }
   }
-  // console.log(compareVer(process.versions.app, versionInfo.version))
-  // console.log(process.versions.app, versionInfo.version)
 }
 
 export const downloadUpdate = () => {

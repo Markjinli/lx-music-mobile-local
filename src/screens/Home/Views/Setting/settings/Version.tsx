@@ -9,7 +9,7 @@ import { sizeFormate } from '@/utils'
 import { useI18n } from '@/lang'
 import { useVersionDownloadProgressUpdated, useVersionInfo } from '@/store/version/hook'
 import Text from '@/components/common/Text'
-import { showModal } from '@/core/version'
+import { checkUpdate, showModal } from '@/core/version'
 
 const currentVer = process.versions.app
 export default memo(() => {
@@ -20,8 +20,10 @@ export default memo(() => {
   const [tip, setTip] = useState('')
   const progress = useVersionDownloadProgressUpdated()
   const handleOpenVersionModal = () => {
-    // setVersionInfo({ showModal: true })
     showModal()
+    if (versionInfo.status != 'downloading' && versionInfo.status != 'downloaded') {
+      void checkUpdate({ autoDownload: true })
+    }
   }
 
   useEffect(() => {

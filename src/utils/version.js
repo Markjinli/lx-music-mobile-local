@@ -1,8 +1,11 @@
 import { httpGet } from '@/utils/request'
-import { author, name } from '../../package.json'
 import { downloadFile, stopDownload, temporaryDirectoryPath } from '@/utils/fs'
 import { getSupportedAbis, installApk } from '@/utils/nativeModules/utils'
 import { APP_PROVIDER_NAME } from '@/config/constant'
+
+const UPDATE_OWNER = 'Markjinli'
+const UPDATE_REPO = 'lx-music-mobile-local'
+const APK_PREFIX = 'lx-music-mobile'
 
 const abis = [
   'arm64-v8a',
@@ -13,21 +16,23 @@ const abis = [
 ]
 
 const address = [
-  [`https://raw.githubusercontent.com/${author.name}/${name}/master/publish/version.json`, 'direct'],
-  ['https://registry.npmjs.org/lx-music-mobile-version-info/latest', 'npm'],
-  [`https://cdn.jsdelivr.net/gh/${author.name}/${name}/publish/version.json`, 'direct'],
-  [`https://fastly.jsdelivr.net/gh/${author.name}/${name}/publish/version.json`, 'direct'],
-  [`https://gcore.jsdelivr.net/gh/${author.name}/${name}/publish/version.json`, 'direct'],
-  ['https://registry.npmmirror.com/lx-music-mobile-version-info/latest', 'npm'],
-  ['https://gitee.com/lyswhut/lx-music-mobile-versions/raw/master/version.json', 'direct'],
-  ['http://cdn.stsky.cn/lx-music/mobile/version.json', 'direct'],
+  [`https://api.github.com/repos/${UPDATE_OWNER}/${UPDATE_REPO}/releases?per_page=20`, 'github'],
+  [`https://cdn.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
+  [`https://fastly.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
+  [`https://gcore.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
+  [`https://raw.githubusercontent.com/${UPDATE_OWNER}/${UPDATE_REPO}/master/publish/version.json`, 'direct'],
 ]
 
+const githubHeaders = {
+  Accept: 'application/vnd.github+json',
+  'User-Agent': 'lx-music-mobile-local',
+}
 
 const request = async(url, retryNum = 0) => {
   return new Promise((resolve, reject) => {
     httpGet(url, {
       timeout: 10000,
+      headers: url.includes('api.github.com') ? githubHeaders : undefined,
     }, (err, resp, body) => {
       if (err || resp.statusCode != 200) {
         ++retryNum >= 3
@@ -45,12 +50,26 @@ const getDirectInfo = async(url) => {
   })
 }
 
-const getNpmPkgInfo = async(url) => {
-  return request(url).then(json => {
-    if (!json.versionInfo) throw new Error('failed')
-    const info = JSON.parse(json.versionInfo)
-    if (info.version == null) throw new Error('failed')
-    return info
+const normalizeRelease = (release) => {
+  const version = String(release?.tag_name || '').replace(/^v/i, '')
+  return {
+    version,
+    desc: release?.body || '',
+  }
+}
+
+const getGithubReleaseInfo = async(url) => {
+  return request(url).then(body => {
+    const releases = Array.isArray(body) ? body : (body?.tag_name ? [body] : [])
+    const published = releases.filter(item => item && !item.draft && item.tag_name)
+    if (!published.length) throw new Error('failed')
+    const latest = normalizeRelease(published[0])
+    if (!latest.version) throw new Error('failed')
+    return {
+      version: latest.version,
+      desc: latest.desc,
+      history: published.slice(1).map(normalizeRelease).filter(item => item.version),
+    }
   })
 }
 
@@ -58,11 +77,11 @@ export const getVersionInfo = async(index = 0) => {
   const [url, source] = address[index]
   let promise
   switch (source) {
+    case 'github':
+      promise = getGithubReleaseInfo(url)
+      break
     case 'direct':
       promise = getDirectInfo(url)
-      break
-    case 'npm':
-      promise = getNpmPkgInfo(url)
       break
   }
 
@@ -86,7 +105,7 @@ let apkSavePath
 
 export const downloadNewVersion = async(version, onDownload = noop) => {
   const abi = await getTargetAbi()
-  const url = `https://github.com/${author.name}/${name}/releases/download/v${version}/${name}-v${version}-${abi}.apk`
+  const url = `https://github.com/${UPDATE_OWNER}/${UPDATE_REPO}/releases/download/v${version}/${APK_PREFIX}-v${version}-${abi}.apk`
   let savePath = temporaryDirectoryPath + '/lx-music-mobile.apk'
 
   if (downloadJobId) stopDownload(downloadJobId)
@@ -97,14 +116,6 @@ export const downloadNewVersion = async(version, onDownload = noop) => {
     readTimeout: 30000,
     begin({ statusCode, contentLength }) {
       onDownload(contentLength, 0)
-      // switch (statusCode) {
-      //   case 200:
-      //   case 206:
-      //     break
-      //   default:
-      //     onDownload(null, contentLength, 0)
-      //     break
-      // }
     },
     progress({ contentLength, bytesWritten }) {
       onDownload(contentLength, bytesWritten)
