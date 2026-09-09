@@ -40,6 +40,8 @@ jobs:
           # 默认情况下 assembleDebug 不打包 JS，运行时需连接 Metro 开发服务器
           # 设置 debuggableVariants = [] 让 debug 构建也像 release 一样打包 JS bundle
           sed -i 's|// debuggableVariants = \["liteDebug", "prodDebug"\]|debuggableVariants = []|' android/app/build.gradle
+          # GitHub-hosted runner 约 7GB 内存，原 4g+2g metaspace 容易把 daemon OOM 杀掉
+          sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m/' android/gradle.properties
 
       - name: Build Debug APK
         env:
@@ -47,7 +49,8 @@ jobs:
         shell: bash
         run: |
           cd android
-          ./gradlew assembleDebug \
+          ./gradlew assembleDebug --no-daemon \
+            -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=768m" \
             -PMYAPP_UPLOAD_STORE_FILE="$HOME/.android/debug.keystore" \
             -PMYAPP_UPLOAD_KEY_ALIAS="androiddebugkey" \
             -PMYAPP_UPLOAD_STORE_PASSWORD="android" \
