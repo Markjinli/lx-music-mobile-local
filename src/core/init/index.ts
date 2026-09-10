@@ -6,6 +6,7 @@ import initUserApi from './userApi'
 import initPlayer from './player'
 import dataInit from './dataInit'
 import initSync from './sync'
+import { startGithubBackupAuto } from '@/core/githubBackup/auto'
 import initCommonState from './common'
 import { initDeeplink } from './deeplink'
 import { setApiSource } from '@/core/apiSource'
@@ -62,6 +63,8 @@ export default async() => {
 
   void initSync(setting)
   bootLog('Sync inited.')
+  startGithubBackupAuto()
+  bootLog('Github backup inited.')
 
   // syncSetting()
 

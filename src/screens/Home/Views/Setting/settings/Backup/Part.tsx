@@ -7,6 +7,7 @@ import SubTitle from '../../components/SubTitle'
 import Button from '../../components/Button'
 import { useI18n } from '@/lang'
 import ListImportExport, { type ListImportExportType } from './ListImportExport'
+import Github from './Github'
 
 
 export default memo(() => {
@@ -30,6 +31,7 @@ export default memo(() => {
         </View>
       </SubTitle> */}
       <ListImportExport ref={listImportExportRef} />
+      <Github />
     </>
   )
 })

@@ -72,6 +72,8 @@ const defaultSetting: LX.AppSetting = {
 
   'sync.enable': false,
 
+  'githubBackup.auto': true,
+
   'localMusic.folderPath': '',
   'localMusic.listId': '',
 

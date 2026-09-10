@@ -582,3 +582,39 @@ export const setUserApiAllowShowUpdateAlert = async(id: string, enable: boolean)
   targetApi.allowShowUpdateAlert = enable
   await saveData(userApiPrefix, userApis)
 }
+
+export interface GithubBackupUser {
+  login: string
+  name: string
+  repo: string
+}
+
+export interface GithubBackupLast {
+  time: number
+  repo: string
+  path: string
+}
+
+export const getGithubBackupToken = async() => await getData<string>(storageDataPrefix.githubBackupToken) ?? ''
+export const setGithubBackupToken = async(token: string) => {
+  if (token) await saveData(storageDataPrefix.githubBackupToken, token)
+  else await removeData(storageDataPrefix.githubBackupToken)
+}
+
+export const getGithubBackupUser = async() => await getData<GithubBackupUser>(storageDataPrefix.githubBackupUser)
+export const setGithubBackupUser = async(user: GithubBackupUser | null) => {
+  if (user) await saveData(storageDataPrefix.githubBackupUser, user)
+  else await removeData(storageDataPrefix.githubBackupUser)
+}
+
+export const getGithubBackupPassword = async() => await getData<string>(storageDataPrefix.githubBackupPassword) ?? ''
+export const setGithubBackupPassword = async(password: string) => {
+  if (password) await saveData(storageDataPrefix.githubBackupPassword, password)
+  else await removeData(storageDataPrefix.githubBackupPassword)
+}
+
+export const getGithubBackupDeviceKey = async() => await getData<string>(storageDataPrefix.githubBackupDeviceKey) ?? ''
+export const setGithubBackupDeviceKey = async(key: string) => saveData(storageDataPrefix.githubBackupDeviceKey, key)
+
+export const getGithubBackupLast = async() => await getData<GithubBackupLast>(storageDataPrefix.githubBackupLast)
+export const setGithubBackupLast = async(info: GithubBackupLast) => saveData(storageDataPrefix.githubBackupLast, info)

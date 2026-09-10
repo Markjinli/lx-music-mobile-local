@@ -78,6 +78,13 @@ export const storageDataPrefix = {
   dislikeList: '@dislike_list',
 
   userApi: '@user_api__',
+  builtinUserApiSeed: '@builtin_user_api_seeded_keys',
+
+  githubBackupToken: '@github_backup_token',
+  githubBackupUser: '@github_backup_user',
+  githubBackupPassword: '@github_backup_password',
+  githubBackupDeviceKey: '@github_backup_device_key',
+  githubBackupLast: '@github_backup_last',
 } as const
 
 // v0.x.x 版本的 data keys

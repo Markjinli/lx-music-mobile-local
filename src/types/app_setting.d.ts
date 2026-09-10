@@ -357,6 +357,11 @@ declare global {
       'sync.enable': boolean
 
       /**
+       * 登录 GitHub 后，歌单变更时自动加密备份到私密仓库
+       */
+      'githubBackup.auto': boolean
+
+      /**
        * 本地音乐文件夹路径
        */
       'localMusic.folderPath': string
