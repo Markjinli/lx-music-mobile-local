@@ -18,11 +18,14 @@
 
 ## Fork 说明
 
-本仓库是 [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 的 Fork 版本。
+本仓库是 [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 的 Fork 版本，当前基于原版 **v1.9.0**，版本号 **1.9.0.260915.1**。
 
 **与原版的差异：**
 
 - **新增「本地音乐」功能**：在设置中可选择本地文件夹并扫描音频文件，自动创建"本地音乐"列表，支持完整标签信息读取，缺失信息自动用占位数据填充。
+- **预置自定义音源**：首次启动写入 8 个自定义源，用户删除后不会再次注入。
+- **GitHub 加密备份歌单**：在备份与恢复页登录 GitHub，将歌单加密上传到私密仓库 `lx-music-playlist-backup`。
+- **应用内更新**读取本仓库 GitHub Releases。
 - 功能实现尽量保持低侵入性，大部分为新增代码，便于后续跟随上游更新。
 
 **改动文件清单：**

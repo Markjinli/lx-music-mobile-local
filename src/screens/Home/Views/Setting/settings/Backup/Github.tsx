@@ -30,6 +30,8 @@ import {
 } from '@/core/githubBackup'
 import { setGithubBackupRestoring } from '@/core/githubBackup/auto'
 
+const TOKEN_URL = 'https://github.com/settings/tokens/new?scopes=repo&description=lx-music-playlist-backup'
+
 const formatGithubError = (err: unknown, t: (key: any, val?: any) => string) => {
   const message = String((err as Error).message || err)
   if (message == 'unauthorized' || message.includes('Bad credentials')) return t('setting_backup_github_login_failed')
