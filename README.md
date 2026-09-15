@@ -18,7 +18,7 @@
 
 ## Fork 说明
 
-本仓库是 [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 的 Fork 版本，当前基于原版 **v1.9.0**，版本号 **1.9.0.260915.2**。
+本仓库是 [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 的 Fork 版本，当前基于原版 **v1.9.0**，版本号 **1.9.0.260915.3**。
 
 **与原版的差异：**
 

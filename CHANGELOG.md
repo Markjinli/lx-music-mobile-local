@@ -6,6 +6,12 @@ Project versioning adheres to [Semantic Versioning](http://semver.org/).
 Commit convention is based on [Conventional Commits](http://conventionalcommits.org).
 Change log format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.9.0.260915.3](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260915.2...v1.9.0.260915.3) - 2026-09-15
+
+### 本 fork
+
+- 修复应用内「检测最新版本」在 GitHub API 不可用时，落到 jsDelivr 过期缓存，把最新版显示成 1.8.6 的问题
+
 ## [1.9.0.260915.2](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260915.1...v1.9.0.260915.2) - 2026-09-15
 
 ### 本 fork

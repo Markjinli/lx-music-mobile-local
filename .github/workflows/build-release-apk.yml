@@ -87,3 +87,8 @@ jobs:
             android/app/build/outputs/apk/debug/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Purge jsDelivr version.json cache
+        run: |
+          curl -fsS "https://purge.jsdelivr.net/gh/Markjinli/lx-music-mobile-local/publish/version.json"
+          curl -fsS "https://purge.jsdelivr.net/gh/Markjinli/lx-music-mobile-local@master/publish/version.json"

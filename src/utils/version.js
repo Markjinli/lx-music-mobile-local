@@ -14,9 +14,9 @@ const abis = [
 
 const address = [
   [`https://api.github.com/repos/${UPDATE_OWNER}/${UPDATE_REPO}/releases?per_page=20`, 'github'],
-  [`https://cdn.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
-  [`https://fastly.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
-  [`https://gcore.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}/publish/version.json`, 'direct'],
+  [`https://cdn.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}@master/publish/version.json`, 'direct'],
+  [`https://fastly.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}@master/publish/version.json`, 'direct'],
+  [`https://gcore.jsdelivr.net/gh/${UPDATE_OWNER}/${UPDATE_REPO}@master/publish/version.json`, 'direct'],
   [`https://raw.githubusercontent.com/${UPDATE_OWNER}/${UPDATE_REPO}/master/publish/version.json`, 'direct'],
 ]
 
@@ -70,23 +70,48 @@ const getGithubReleaseInfo = async(url) => {
   })
 }
 
-export const getVersionInfo = async(index = 0) => {
-  const [url, source] = address[index]
-  let promise
-  switch (source) {
-    case 'github':
-      promise = getGithubReleaseInfo(url)
-      break
-    case 'direct':
-      promise = getDirectInfo(url)
-      break
+const compareVersion = (a, b) => {
+  const pa = String(a).replace(/^v/i, '').split('.')
+  const pb = String(b).replace(/^v/i, '').split('.')
+  const len = Math.max(pa.length, pb.length)
+  for (let i = 0; i < len; i++) {
+    const x = parseInt(pa[i], 10) || 0
+    const y = parseInt(pb[i], 10) || 0
+    if (x > y) return 1
+    if (x < y) return -1
   }
+  return 0
+}
 
-  return promise.catch(async(err) => {
-    index++
-    if (index >= address.length) throw err
-    return getVersionInfo(index)
-  })
+const fetchVersionInfo = (url, source) => {
+  if (source === 'github') return getGithubReleaseInfo(url)
+  return getDirectInfo(url)
+}
+
+const pickNewest = (infos) => {
+  let best = infos[0]
+  for (let i = 1; i < infos.length; i++) {
+    if (compareVersion(infos[i].version, best.version) === 1) best = infos[i]
+  }
+  return best
+}
+
+export const getVersionInfo = async() => {
+  try {
+    return await fetchVersionInfo(address[0][0], address[0][1])
+  } catch {}
+
+  const results = await Promise.allSettled(
+    address.slice(1).map(([url, source]) => fetchVersionInfo(url, source))
+  )
+  const infos = []
+  let lastErr
+  for (const result of results) {
+    if (result.status === 'fulfilled') infos.push(result.value)
+    else lastErr = result.reason
+  }
+  if (!infos.length) throw lastErr || new Error('failed')
+  return pickNewest(infos)
 }
 
 const getTargetAbi = async() => {
