@@ -63,6 +63,10 @@ export default forwardRef<ChoosePathType, ChoosePathProps>(({
         // }
       } else {
         void selectFile({
+          // Android MimeTypeMap has no .lxmc/.bin mapping. Passing only extTypes
+          // makes Xiaomi/HyperOS DocumentsUI filter them out, so the picker
+          // appears to contain only folders. */* shows all files; JS still filters.
+          mimeTypes: ['*/*'],
           extTypes: options.filter,
           toPath: TEMP_FILE_PATH,
         }).then((file) => {

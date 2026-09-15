@@ -6,6 +6,12 @@ Project versioning adheres to [Semantic Versioning](http://semver.org/).
 Commit convention is based on [Conventional Commits](http://conventionalcommits.org).
 Change log format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.9.0.260915.2](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260915.1...v1.9.0.260915.2) - 2026-09-15
+
+### 本 fork
+
+- 修复小米等设备上「备份与恢复 → 导入列表」系统文件选择器只显示文件夹、看不到 `.lxmc` 备份文件的问题（系统选择器按 MIME 过滤，而 `.lxmc` 没有系统 MIME 映射）
+
 ## [1.9.0.260915.1](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.8.6...v1.9.0.260915.1) - 2026-09-15
 
 基于原版 v1.9.0 的 fork 构建。
