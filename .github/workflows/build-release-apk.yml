@@ -17,44 +17,35 @@ jobs:
       - name: Setup Env
         uses: ./.github/actions/setup
 
-      - name: Create debug keystore for Gradle config phase
+      - name: Restore release keystore
         shell: bash
         run: |
-          # signingConfigs.release 块在配置阶段就需要 keystore 或 -P 参数
-          # 生成一个 dummy keystore 以满足配置阶段校验
-          mkdir -p "$HOME/.android"
-          keytool -genkey -v \
-            -keystore "$HOME/.android/debug.keystore" \
-            -alias androiddebugkey \
-            -storepass android \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US" \
-            -noprompt 2>/dev/null || true
+          # 正式签名密钥存放在仓库 Secrets，不随代码提交
+          echo "${{ secrets.KEYSTORE_STORE_FILE_BASE64 }}" | base64 --decode > "android/app/${{ secrets.KEYSTORE_STORE_FILE }}"
 
-      - name: Configure debug build to bundle JS
+      - name: Tune Gradle memory
         shell: bash
         run: |
-          # 默认情况下 assembleDebug 不打包 JS，运行时需连接 Metro 开发服务器
-          # 设置 debuggableVariants = [] 让 debug 构建也像 release 一样打包 JS bundle
-          sed -i 's|// debuggableVariants = \["liteDebug", "prodDebug"\]|debuggableVariants = []|' android/app/build.gradle
           # GitHub-hosted runner 约 7GB 内存，原 4g+2g metaspace 容易把 daemon OOM 杀掉
           sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx3g -XX:MaxMetaspaceSize=768m/' android/gradle.properties
 
-      - name: Build Debug APK
+      - name: Build Release APK
         env:
           DISABLE_SVG: 1
         shell: bash
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon \
+          ./gradlew assembleRelease --no-daemon \
             -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=768m" \
-            -PMYAPP_UPLOAD_STORE_FILE="$HOME/.android/debug.keystore" \
-            -PMYAPP_UPLOAD_KEY_ALIAS="androiddebugkey" \
-            -PMYAPP_UPLOAD_STORE_PASSWORD="android" \
-            -PMYAPP_UPLOAD_KEY_PASSWORD="android"
+            -PMYAPP_UPLOAD_STORE_FILE="${{ secrets.KEYSTORE_STORE_FILE }}" \
+            -PMYAPP_UPLOAD_KEY_ALIAS="${{ secrets.KEYSTORE_KEY_ALIAS }}" \
+            -PMYAPP_UPLOAD_STORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}" \
+            -PMYAPP_UPLOAD_KEY_PASSWORD="${{ secrets.KEYSTORE_KEY_PASSWORD }}"
+
+      - name: Remove keystore from workspace
+        if: always()
+        shell: bash
+        run: rm -f "android/app/${{ secrets.KEYSTORE_STORE_FILE }}"
 
       - name: Get package version
         run: |
@@ -63,7 +54,7 @@ jobs:
 
       - name: Generate file MD5
         run: |
-          cd android/app/build/outputs/apk/debug
+          cd android/app/build/outputs/apk/release
           md5sum *.apk
 
       - name: Create Release and Upload APKs
@@ -80,11 +71,13 @@ jobs:
             - 新增「本地音乐」扫描导入功能
             - 详细改动见 [README](https://github.com/Markjinli/lx-music-mobile-local#fork-说明)
 
-            > Debug 构建，安装前需卸载原版。
+            ### 安装说明
+            - 本版为**正式签名**构建（非 debug），可直接在应用内更新。
+            - 从 1.9.0.260919.1 及更早的 debug 版升级，签名不同，需要**先卸载旧版再安装**（歌单可在应用内从 GitHub 备份恢复）。
           draft: false
           prerelease: false
           files: |
-            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

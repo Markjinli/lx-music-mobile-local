@@ -6,6 +6,13 @@ Project versioning adheres to [Semantic Versioning](http://semver.org/).
 Commit convention is based on [Conventional Commits](http://conventionalcommits.org).
 Change log format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.9.0.260919.2](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260919.1...v1.9.0.260919.2) - 2026-09-19
+
+### 本 fork
+
+- 改用正式签名密钥构建 release 版（此前是 debug 版），后续版本可在应用内直接覆盖安装
+- 从 1.9.0.260919.1 及更早的 debug 版升级需先卸载旧版
+
 ## [1.9.0.260919.1](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260915.3...v1.9.0.260919.1) - 2026-09-19
 
 ### 本 fork
