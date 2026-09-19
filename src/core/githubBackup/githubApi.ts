@@ -5,6 +5,8 @@ const UA = 'lx-music-mobile-local'
 
 export const GITHUB_BACKUP_REPO = 'lx-music-playlist-backup'
 export const GITHUB_BACKUP_PATH = 'lx_list.enc.json'
+export const GITHUB_BACKUP_INDEX_PATH = 'backups/index.json'
+export const GITHUB_BACKUP_AUTO_PATH = 'backups/auto.enc.json'
 
 interface GithubResponse<T> {
   ok: boolean
@@ -90,7 +92,7 @@ export const getFileSha = async(token: string, login: string, repo: string, path
   return { sha: res.body.sha ?? '', content }
 }
 
-export const putFile = async(token: string, login: string, repo: string, path: string, text: string, sha?: string) => {
+export const putFile = async(token: string, login: string, repo: string, path: string, text: string, sha?: string, retryConflict = true) => {
   const send = async(currentSha?: string) => {
     const body: Record<string, unknown> = {
       message: `backup playlists ${new Date().toISOString()}`,
@@ -105,8 +107,35 @@ export const putFile = async(token: string, login: string, repo: string, path: s
 
   let res = await send(sha)
   if (res.status == 409) {
+    if (!retryConflict) throw new Error('conflict')
     const latest = await getFileSha(token, login, repo, path)
     res = await send(latest.sha || undefined)
   }
   if (!res.ok) throw new Error(res.message || 'upload failed')
+}
+
+export const deleteFile = async(token: string, login: string, repo: string, path: string, sha?: string) => {
+  let currentSha = sha
+  if (!currentSha) {
+    const file = await getFileSha(token, login, repo, path)
+    if (!file.sha) return
+    currentSha = file.sha
+  }
+
+  const send = async(fileSha: string) => request(token, `/repos/${login}/${repo}/contents/${path}`, {
+    method: 'DELETE',
+    body: {
+      message: `delete backup ${new Date().toISOString()}`,
+      sha: fileSha,
+    },
+  })
+
+  let res = await send(currentSha)
+  if (res.status == 409) {
+    const latest = await getFileSha(token, login, repo, path)
+    if (!latest.sha) return
+    res = await send(latest.sha)
+  }
+  if (res.status == 404) return
+  if (!res.ok) throw new Error(res.message || 'delete file failed')
 }
