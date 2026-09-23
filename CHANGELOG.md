@@ -6,6 +6,17 @@ Project versioning adheres to [Semantic Versioning](http://semver.org/).
 Commit convention is based on [Conventional Commits](http://conventionalcommits.org).
 Change log format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.9.1.260923.1](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260919.2...v1.9.1.260923.1) - 2026-09-23
+
+### 本 fork
+
+- 同步原版 v1.9.1，保留本地音乐、预置自定义音源、GitHub 加密备份歌单
+
+### 同步原版 v1.9.1
+
+- 优化 tx 推荐歌单列表
+- 修复打开某些 kg 歌单时歌曲丢失的问题
+
 ## [1.9.0.260919.2](https://github.com/Markjinli/lx-music-mobile-local/compare/v1.9.0.260919.1...v1.9.0.260919.2) - 2026-09-19
 
 ### 本 fork

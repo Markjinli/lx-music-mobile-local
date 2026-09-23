@@ -70,7 +70,7 @@ debug 版（≤ 1.9.0.260919.1）与 release 版签名不同：
 
 `version` / `versionCode` 要同步改的地方：
 
-1. `package.json` → `version`（形如 `1.9.0.260919.2`，**不要加前导 `v`**，否则 `compareVer` 会判定比 1.8.6 还旧）和 `versionCode`（递增）
+1. `package.json` → `version`（形如 `1.9.1.260923.1`，**不要加前导 `v`**，否则 `compareVer` 会判定比 1.8.6 还旧）和 `versionCode`（递增）
 2. `publish/version.json` → `version`、`desc`，并把上一版推进 `history` 数组开头
 3. `CHANGELOG.md` → 新增版本小节
 4. `publish/changeLog.md` → 手动发布（`release.yml`，仅 workflow_dispatch）时用作 Release 正文

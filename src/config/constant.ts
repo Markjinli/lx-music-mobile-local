@@ -78,7 +78,7 @@ export const storageDataPrefix = {
   dislikeList: '@dislike_list',
 
   userApi: '@user_api__',
-  builtinUserApiSeed: '@builtin_user_api_seeded_keys',
+  builtinUserApiMap: '@builtin_user_api_map',
 
   githubBackupToken: '@github_backup_token',
   githubBackupUser: '@github_backup_user',
